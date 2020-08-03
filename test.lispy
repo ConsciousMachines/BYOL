@@ -1,9 +1,4 @@
-﻿
-
-
 (+ (* 2 3) (- 5 4))
-
-
 
 
 ; 10 - Q-Expressions
@@ -152,14 +147,6 @@
 ; should be the same as 
 ; (\ {n} {\ {m} {+ n m}})
 
-; Remember - right now print is printing the 0th index. 
-
-(def {soy} ((\ {n} {\ {m} {+ m n}}) 2))		; this is an S-exp with a FUN at index 0. should not have S-expr wrapper.
-
-
-((\ {n} {\ {m} {+ m n}}) 2)
-
-(print soy)
 
 "hello\n"
 "hello\""
