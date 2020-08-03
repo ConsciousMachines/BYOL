@@ -1,0 +1,167 @@
+﻿
+
+
+(+ (* 2 3) (- 5 4))
+
+
+
+
+; 10 - Q-Expressions
+(list 1 2 3 4)
+
+({head (list 1 2 3 4)})
+
+(eval {head (list 1 2 3 4)})
+
+(tail {tail tail tail})
+
+(eval (tail {tail tail {5 6 7}}))
+
+(eval (head {(+ 1 2) (+ 10 20)}))
+
+(+)
+
+(eval (head {5 10 11 15}))
+
+(eval (head {+ - / - + *}))
+
+((eval (head {+ - + })) 10 20)
+
+
+
+
+; 11 - Variables 
+(def {c d} 5 6) 
+
+(def {arglist} {a b x y}) 
+
+(arglist)
+
+(def arglist 1 2 3 4)
+
+(list a b x y)
+
+
+
+
+; 12 - Functions
+(def {add-mul} (\ {x y} {+ x (* x y)}))
+
+(add-mul 10 20)
+
+(add-mul 10)
+
+(def {add-mul-ten} (add-mul 10))
+
+(add-mul-ten 50)
+
+(def {fun} (\ {args body} {def (head args) (\ (tail args) body)}))
+
+(fun {add-together x y} {+ x y})
+
+(add-together 2 2)
+
+(add-together 2)
+
+(fun {unpack f xs} {eval (join (list f) xs)})
+
+(fun {pack f & xs} {f xs})
+
+(def {uncurry} pack)
+
+(def {curry} unpack)
+
+(curry + {5 6 7})
+
+(uncurry head 5 6 7)
+
+
+
+
+; 13 - Conditionals
+
+(> 10 5)
+
+(<= 88 5)
+
+(== 5 6)
+
+(== 5 {})
+
+(== 1 1)
+
+(!= {} 56)
+
+(== {1 2 3 {5 6}} {1 2 3 {5 6}})
+
+(def {xx yy} 100 200)
+
+(if (== xx yy) {+ xx yy} {- xx yy})
+
+(fun {len l} 
+    {if (== l {})
+		{0}
+		{+ 1 (len (tail l))}})
+
+(len {1 2 3})
+
+(fun {reverse l}
+	{if (== l {})
+		{{}}
+		{join (reverse (tail l)) (head l)}})
+
+(reverse {1 2 3})
+
+
+
+
+; test 
+
+
+(fun {fac n}
+	{if (== n 1)
+		{1}
+		{* n (fac (- n 1))}})
+(fac 5)
+
+
+
+(\ {n} {\ {m} {+ m n}})
+
+(print (\ {n} {\ {m} {+ m n}}))
+
+(print ((\ {n} {\ {m} {+ m n}}) 2) )
+
+(print (== 
+	(eval {\ {m} {+ m n}})
+	((\ {n} {\ {m} {+ m n}}) 2)))
+
+
+(print ((\ {n} {\ {m} {+ m n}}) 2))
+
+(print ((\ {n} {\ {m} {+ m n}}) 2))
+
+
+(print (eval {\ {m} {+ m n}}))
+
+
+
+
+; goal:
+; (\ {n m} {+ n m})
+; should be the same as 
+; (\ {n} {\ {m} {+ n m}})
+
+; Remember - right now print is printing the 0th index. 
+
+(def {soy} ((\ {n} {\ {m} {+ m n}}) 2))		; this is an S-exp with a FUN at index 0. should not have S-expr wrapper.
+
+
+((\ {n} {\ {m} {+ m n}}) 2)
+
+(print soy)
+
+"hello\n"
+"hello\""
+
+(eval (head {"hello" "world"}))
