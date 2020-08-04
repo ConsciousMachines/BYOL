@@ -84,4 +84,5 @@ It worked fine. To preserve the density of my hair I shall not debug these thing
 
 # Going Furrrther
 - JIT compiler feature, since the expression is already an AST
-- enough library functions to implement language processors, such as those from EOPL or Beautiful Racket or SICP.
+- enough library functions to implement language processors, such as those from EOPL or Beautiful Racket
+- implement the Pie language from Little Typer in here. 
