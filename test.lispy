@@ -1,6 +1,8 @@
 (+ (* 2 3) (- 5 4))
 
 
+
+
 ; 10 - Q-Expressions
 (list 1 2 3 4)
 
@@ -142,12 +144,7 @@
 
 
 
-; goal:
-; (\ {n m} {+ n m})
-; should be the same as 
-; (\ {n} {\ {m} {+ n m}})
-
-
+; 14 - Strings
 "hello\n"
 "hello\""
 
