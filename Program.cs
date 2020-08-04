@@ -2,29 +2,18 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 
-/*
-p r e s s   ctrl m o / ctrl m l   t o   m i n i m i z e   /   e x p a n d
+/*     p r e s s   ctrl m o / ctrl m l   t o   m i n i m i z e   /   e x p a n d
 IDEAS
 - add some library fns, see bonus challenges
 - META: script variables for a SHADER, movement of a cube, or in a game engine.
 - check out my previous JIT projects and the Creel video on fn ptrs
 - META: once we have an AST, we can compile it (Nystrom) then create a JIT environment (C++) 
     and the code can now be run in that JIT area (assuming it's a simple stack, doesnt take more than 4kb)
-
-- FINISHED: the copy problem!
-- FINISHED: the neg num bs
-- FINISHED: immutable env
-- FINISHED: import, python-style
-- FINISHED: the command line now reads what you write as-is, without any wrapper s-expr hacks! >:D
-- FINISHED: my type function now takes in 1 argument and returns its type!
-- FINISHED: fixed lambda environments to be recursive, now Y-Combinator works. 
 */
 
 
 namespace Lispy
 {
-
-
     class Lispy
     {
         static void Main(string[] args)
@@ -32,25 +21,10 @@ namespace Lispy
             Console.WriteLine("Lispy Version 0.1.5\nPress Ctrl+C to Exit\n");
 
             lenv global = new lenv();
-            global.Add("sev", new lval(5));
             lval.lenv_add_builtins(global);
 
-
             //   L O A D   S C R I P T
-            //Tools.load_script(global, "stdlib"); // run script
-            string script_name = "go";
-            string base_dir = @"C:\Users\pwnag\source\repos\Lispy\Lispy\";
-            string file_name = System.IO.Path.Join(base_dir, script_name + ".lispy");
-            var sb = new StringBuilder(System.IO.File.ReadAllText(file_name, Encoding.ASCII));
-
-            // run script
-            lval x = new lval(LVAL.SEXPR); // x is wrapper for all exprs in the file
-            Tools.lval_read_expr(x, sb.Append('\0').ToString(), 0, '\0');
-            foreach (lval expr in x.cell)
-            {
-                expr.print("\n");           // print original exp
-                expr.eval(global).print("\n");   // print evaluated exp
-            }
+            Tools.load_script(global, "go"); // "stdlib"
 
 
             while (true) // interactive prompt
@@ -59,9 +33,8 @@ namespace Lispy
                 Console.Write("lispy> ");
                 StringBuilder input = new StringBuilder(Console.ReadLine());
 
-
                 // parse & eval
-                x = new lval(LVAL.SEXPR);
+                lval x = new lval(LVAL.SEXPR);
                 Tools.lval_read_expr(x, input.Append('\0').ToString(), 0, '\0');
                 x.cell[0].eval(global).print("\n"); // doing this now makes me require outermost parentheses (as it should)
             }
@@ -203,13 +176,11 @@ namespace Lispy
             // if all formals have been bound, eval
             if (formals.count == 0)
             {
-
                 // set env parent to eval env 
-                //env.par = e; // THIS LINE IS ONLY NEEDED FOR RECURSIVE FUNCTIONS. 
-
+                //env.par = e; 
+                
                 // my method sets the previous env's parent to the one above. this funciton would delete that upon fn invocation.
                 // in order for both to work, I need to set the previous function's current environment as the one above, and this sets its parent to teh global one.
-
 
                 // since i have set the lambda's env to any previous env, any first lambda has its parent the global env. 
                 // then any nested lambda will get the outer lambda's scope, which is itself linked to the global env. 
@@ -272,7 +243,7 @@ namespace Lispy
             // so in memory, nothing is changed except the list forgot about x. 
             // so there is still only one reference to x. 
             // in C#, creating x adds a reference to that item. then i pop it from the list, 
-            // which deletes one, so that item's references are still 1.  // private lval take(int i) => pop(i);
+            // which deletes one, so that item's references are still 1. 
             lval x = this.cell[i];
 
             cell.RemoveAt(i);
@@ -385,7 +356,6 @@ namespace Lispy
 
 
             // pop first element
-            //lval x = a.pop(0);
             long x = a.pop(0).num;
 
             // if no arguments and sub then perform unary negation
@@ -614,12 +584,9 @@ namespace Lispy
             lval formals = a.pop(0);
             lval body = a.pop(0);
 
-            // WRONG APPROACH
             lenv new_env = new lenv();
             new_env.par = e;
-            return new lval(new_env, formals, body); // FIXED: we can't use a new env with parent e (breaks fib) must be e itself. 
-
-            //return new lval(e, formals, body); // FIXED: we can't use a new env with parent e (breaks fib) must be e itself. 
+            return new lval(new_env, formals, body); 
         }
         // external interfacing and misc
         static private lval builtin_print(lenv e, lval a)
@@ -682,28 +649,17 @@ namespace Lispy
         public lenv() : base() { }
         public lval get(lval k)
         {
-            foreach (var key in this.Keys)
-            {
-                if (key == k.sym_err)
-                {
-                    return this[key].copy();
-                }
-            }
+            if (this.ContainsKey(k.sym_err)) return this[k.sym_err].copy();
 
             // if no symbol check in parent otherwise error
-            if (par != null)
-            {
-                return par.get(k);
-            }
+            if (par != null) return par.get(k);
             else return new lval($"Unbound Symbol! {k.sym_err}", LVAL.ERR);
-
         }
         public void put(lval k, lval v) // for local env. I M M U T A B L E 
         {
-            if (this.ContainsKey(k.sym_err)) // this makes it immutable, BUT ONLY IN ONE SCOPE! (think one cactus leg)
-            {
+            // this makes it immutable, BUT ONLY IN ONE SCOPE! (think one cactus leg)
+            if (ContainsKey(k.sym_err)) 
                 Tools.LASSERT(null, false, $"Tried to mutate already defined variable: {k.sym_err}");
-            }
             this[k.sym_err] = v.copy();
         }
         public void def(lval k, lval v)
@@ -721,23 +677,16 @@ namespace Lispy
             foreach (var key in Keys) n[key] = this[key].copy();
             return n;
         }
-
         public void print(string offset = "")
         {
-            if (this.Keys.Count == 0) Console.WriteLine($"{offset}<empty>");
-            foreach (var k in Keys)
+            if (Keys.Count == 0) Console.WriteLine($"{offset}<empty>");
+            foreach (var k in Keys) Console.WriteLine($"{offset}{k}\t->\t{this[k].type}");
+            if (par != null)
             {
-                Console.WriteLine($"{offset}{k}\t->\t{this[k].type}");
-            }
-            if (this.par != null)
-            {
-                if (this.par.par != null)
-                {
-                    Console.WriteLine($"{offset}  ||_p_a_r_e_n_t_|| :=");
-                }
+                if (this.par.par != null) Console.WriteLine($"{offset}  ||_p_a_r_e_n_t_|| :=");
                 else Console.WriteLine($"{offset}  ||_G_L_O_B_A_L_|| :=");
 
-                this.par.print(new String(' ', 4) + offset);
+                par.print(new String(' ', 4) + offset);
             }
         }
     }
@@ -752,12 +701,11 @@ namespace Lispy
             // get full file name & read it
             string file_name = System.IO.Path.Join(base_dir, script_name + ".lispy");
             var sb = new StringBuilder(System.IO.File.ReadAllText(file_name, Encoding.ASCII));
-
-
+            
             // run script
-            lval all_exprs = new lval(LVAL.SEXPR);
-            Tools.lval_read_expr(all_exprs, sb.Append('\0').ToString(), 0, '\0');
-            foreach (lval expr in all_exprs.cell)
+            lval x = new lval(LVAL.SEXPR); // x is wrapper for all exprs in the file
+            Tools.lval_read_expr(x, sb.Append('\0').ToString(), 0, '\0');
+            foreach (lval expr in x.cell)
             {
                 expr.print("\n");           // print original exp
                 expr.eval(e).print("\n");   // print evaluated exp
