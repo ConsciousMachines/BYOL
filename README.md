@@ -86,3 +86,20 @@ It worked fine. To preserve the density of my hair I shall not debug these thing
 - JIT compiler feature, since the expression is already an AST
 - enough library functions to implement language processors, such as those from EOPL or Beautiful Racket
 - implement the Pie language from Little Typer in here. 
+
+# Update 1
+- Added Hindley Milner type inference, the entire expanded interpreter is in the file "Hindley_Milner.cs". Now it can type things like:
+```lisp
+(\ {g x} {g (g x)})
+
+; prints t8 -> t8 -> t8 -> t8
+
+(\ {g} {\ {x} {g (g x)}})
+
+; prints t10 -> t10 -> t10 -> t10
+
+(\ {g} {\ {x} {g (g (+ x 1))}})
+
+; prints int -> int -> int -> int
+```
+This will be useful for implementing the Pie language later. I adopted the algorithm from Sestoft's Programming Language Concepts book, so had to remix the type rules for Lispy, basically S-Expressions became ML-style function calls, and lambdas became quasi-letfun expressions. 
