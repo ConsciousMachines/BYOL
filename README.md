@@ -90,15 +90,20 @@ It worked fine. To preserve the density of my hair I shall not debug these thing
 # Update 1
 - Added Hindley Milner type inference, the entire expanded interpreter is in the file "Hindley_Milner.cs". Now it can type things like:
 ```lisp
-(\ {g x} {g (g x)})
+(\ {g x} 
+   {g (g x)})
 
 ; prints t8 -> t8 -> t8 -> t8
 
-(\ {g} {\ {x} {g (g x)}})
+(\ {g} 
+   {\ {x} 
+      {g (g x)}})
 
 ; prints t10 -> t10 -> t10 -> t10
 
-(\ {g} {\ {x} {g (g (+ x 1))}})
+(\ {g} 
+   {\ {x} 
+      {g (g (+ x 1))}})
 
 ; prints int -> int -> int -> int
 ```
