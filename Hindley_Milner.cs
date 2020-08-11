@@ -1493,8 +1493,10 @@ namespace Lispy
                     // work when the op's type is a variable?
 
                     // TODO: what happens in a lambda, when the operator has a type variable?
+                    
+                    var ret_type = _exp_carrier.GetRange(e.cell.Count - 1, _exp_carrier.Count - e.cell.Count + 1);
 
-                    return _exp_carrier.Last();
+                    return Type.makeNewFunType(ret_type); // needed for nested lambdas
             }
             return Type.make_META_ERROR("Type check failed bruv");
         }
