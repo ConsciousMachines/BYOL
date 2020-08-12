@@ -4,11 +4,16 @@ C# implementation of Daniel Holden's "Build Your Own Lisp" with a *twist*
 # Structural Changes
 My idea of a finished Lisp is to get the Y-Combinator working on it. First I faithfully re-created the system as per the book, with all chapters' tests passing. But the Y-Combinator gave binding errors (same happens in the original C version). Consider this:
 ```lisp
-(def {add} (\ {n m} {+ m n}))
+(def {add} 
+     (\ {n m} 
+        {+ m n}))
 ((add 2) 3)
 ; returns 5
 
-(def {add_} (\ {n} {\ {m} {+ m n}}))
+(def {add_} 
+     (\ {n} 
+        {\ {m} 
+           {+ m n}}))
 ((add_ 2) 3)
 ; unbound symbol n!
 
